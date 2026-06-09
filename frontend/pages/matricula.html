@@ -1,0 +1,13 @@
+const API = "http://localhost:3000/api";
+
+export async function criarMatricula(dados) {
+  const res = await fetch(`${API}/matriculas`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dados)
+  });
+
+  return await res.json();
+}
