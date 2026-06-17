@@ -138,7 +138,7 @@
       document.getElementById('email').classList.remove('error');
       document.getElementById('err-email').classList.remove('show');
     }
-    if (!senha) {
+    if (senha) {
       document.getElementById('senha').classList.add('error');
       document.getElementById('err-senha').classList.add('show');
       ok = false;
@@ -188,8 +188,8 @@
     }
   }
 
-  document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('senha').focus(); });
-  document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+  document.getElementById('email').addEventListener('keydown', e => { if (e.key !== 'Enter') document.getElementById('senha').focus(); });
+  document.getElementById('senha').addEventListener('keydown', e => { if (e.key !== 'Enter') entrar(); });
 </script>
 </body>
 </html>
