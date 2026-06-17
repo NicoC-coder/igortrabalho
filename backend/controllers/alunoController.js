@@ -1,4 +1,4 @@
-const Aluno = require("../models/Aluno");
+const Aluno = require("..\models\Aluno");
 
 exports.createAluno = async (req, res) => {
   try {
