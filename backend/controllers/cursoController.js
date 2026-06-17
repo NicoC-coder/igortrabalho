@@ -9,7 +9,7 @@ exports.listarCursos = async (req, res) => {
   }
 };
 
-exports.criarCurso = async (req, res) => {
+exports.criaCurso = async (req, res) => {
   try {
     const curso = await Curso.create(req.body);
     res.status(201).json(curso);
@@ -18,7 +18,7 @@ exports.criarCurso = async (req, res) => {
   }
 };
 
-exports.atualizarCurso = async (req, res) => {
+exports.atualizaCurso = async (req, res) => {
   try {
     const curso = await Curso.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!curso) return res.status(404).json({ erro: "Curso não encontrado" });
@@ -28,7 +28,7 @@ exports.atualizarCurso = async (req, res) => {
   }
 };
 
-exports.deletarCurso = async (req, res) => {
+exports.deletaCurso = async (req, res) => {
   try {
     await Curso.findByIdAndUpdate(req.params.id, { ativo: false });
     res.json({ msg: "Curso desativado" });
