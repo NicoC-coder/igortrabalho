@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cursos — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; font-family: var(--font-sans); }
+    .container { max-width: 780px; margin: 0 auto; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .top-left h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+    .top-left p { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+    .back-btn { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 12px; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .filters { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--color-text-secondary); pointer-events: none; }
+    .search-wrap input { width: 100%; height: 36px; padding: 0 12px 0 34px; font-size: 13px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+    .search-wrap input:focus { border-color: #028090; }
+    .filter-btns { display: flex; gap: 6px; }
+    .filter-btn { height: 36px; padding: 0 14px; font-size: 12px; font-weight: 500; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+    .filter-btn.active { background: #028090; color: #fff; border-color: #028090; }
+    .results-info { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 0.75rem; }
+    .cursos-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    .curso-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.15s; }
+    .curso-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .curso-banner { height: 6px; width: 100%; }
+    .curso-body { padding: 1.1rem; flex: 1; }
+    .curso-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.6rem; }
+    .curso-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: var(--border-radius-md); font-weight: 500; }
+    .tag-vagas { background: #E1F5EE; color: #0F6E56; }
+    .tag-lotado { background: #FAECE7; color: #993C1D; }
+    .curso-nome { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+    .curso-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: 0.75rem; }
+    .meta-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    .curso-footer { padding: 0.85rem 1.1rem; border-top: 0.5px solid var(--color-border-tertiary); }
+    .btn-matricular { width: 100%; height: 34px; border: none; border-radius: var(--border-radius-md); font-size: 12px; font-weight: 500; font-family: var(--font-sans); color: #fff; cursor: pointer; transition: background 0.15s; }
+    .btn-matricular.disponivel { background: #028090; }
+    .btn-matricular.disponivel:hover { background: #026b78; }
+    .btn-matricular.lotado { background: #B4B2A9; cursor: not-allowed; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--color-text-secondary); grid-column: 1/-1; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="top-bar">
+      <div class="top-left">
+        <h1>Cursos disponíveis</h1>
+        <p>Confira os cursos técnicos e realize sua matrícula</p>
+      </div>
+      <button class="back-btn" onclick="window.location.href='dashboard.html'">
+        <i class="ti ti-arrow-left"></i> Voltar
+      </button>
+    </div>
+
+    <div class="filters">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search" placeholder="Buscar por nome..." oninput="filtrar()"/>
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active" onclick="setFiltro('todos',this)">Todos</button>
+        <button class="filter-btn" onclick="setFiltro('disponivel',this)">Com vagas</button>
+        <button class="filter-btn" onclick="setFiltro('lotado',this)">Lotados</button>
+      </div>
+    </div>
+
+    <div class="results-info" id="results-info"></div>
+    <div class="cursos-grid" id="cursos-grid"><div class="empty">Carregando...</div></div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  let cursos = [], filtroAtual = 'todos';
+  const emojis = ['🩺','💻','📊','🔧','📐','🌐'];
+  const cores  = ['#E05A6B','#028090','#7C3AED','#0D9488','#D97706','#2563EB'];
+
+  async function carregar() {
+    try {
+      const res = await fetch(`${API}/cursos`, { headers: { Authorization: `Bearer ${token}` } });
+      cursos = await res.json();
+      filtrar();
+    } catch(e) { document.getElementById('cursos-grid').innerHTML = '<div class="empty">Erro ao carregar cursos</div>'; }
+  }
+
+  function filtrar() {
+    const q = document.getElementById('search').value.toLowerCase();
+    let lista = cursos.filter(c => c.nome.toLowerCase().includes(q));
+    if (filtroAtual === 'disponivel') lista = lista.filter(c => c.vagas > 0);
+    if (filtroAtual === 'lotado') lista = lista.filter(c => c.vagas === 0);
+    document.getElementById('results-info').textContent = `${lista.length} curso${lista.length!==1?'s':''} encontrado${lista.length!==1?'s':''}`;
+    const g = document.getElementById('cursos-grid');
+    if (!lista.length) { g.innerHTML = '<div class="empty">Nenhum curso encontrado</div>'; return; }
+    g.innerHTML = lista.map((c,i) => `
+      <div class="curso-card">
+        <div class="curso-banner" style="background:${cores[i%cores.length]}"></div>
+        <div class="curso-body">
+          <div class="curso-top">
+            <div class="curso-icon">${emojis[i%emojis.length]}</div>
+            <span class="tag ${c.vagas>0?'tag-vagas':'tag-lotado'}">${c.vagas>0?c.vagas+' vagas':'Lotado'}</span>
+          </div>
+          <div class="curso-nome">${c.nome}</div>
+          <div class="curso-desc">${c.descricao||'Sem descrição'}</div>
+          <div class="meta-row"><i class="ti ti-clock"></i> ${c.duracao||'—'}</div>
+          <div class="meta-row"><i class="ti ti-calendar-check"></i> Idade mín: ${c.idadeMinima} anos</div>
+          <div class="meta-row"><i class="ti ti-users"></i> ${c.vagas} vagas disponíveis</div>
+        </div>
+        <div class="curso-footer">
+          <button class="btn-matricular ${c.vagas>0?'disponivel':'lotado'}"
+            onclick="window.location.href='matricula.html'"
+            ${c.vagas===0?'disabled':''}>
+            ${c.vagas>0?'Matricular-se':'Sem vagas'}
+          </button>
+        </div>
+      </div>`).join('');
+  }
+
+  function setFiltro(f, el) {
+    filtroAtual = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    filtrar();
+  }
+
+  carregar();
+</script>
+</body>
+</html>

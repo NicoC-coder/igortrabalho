@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="dot"></div>
+      <span>Escola Técnica<br>Profissionalizante</span>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Principal</div>
+        <a href="dashboard.html" class="nav-link active"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+        <a href="cursos.html"    class="nav-link"><i class="ti ti-books"></i> Cursos</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Secretaria</div>
+        <a href="cadastro.html"    class="nav-link"><i class="ti ti-user-plus"></i> Cadastro de Aluno</a>
+        <a href="matricula.html"   class="nav-link"><i class="ti ti-clipboard-list"></i> Matrículas</a>
+        <a href="agendamento.html" class="nav-link"><i class="ti ti-calendar"></i> Agendamentos</a>
+        <a href="mensagens.html"   class="nav-link"><i class="ti ti-message"></i> Mensagens</a>
+      </div>
+      <div class="nav-group" id="admin-nav" style="display:none">
+        <div class="nav-group-label">Administração</div>
+        <a href="admin.html" class="nav-link"><i class="ti ti-settings"></i> Painel Admin</a>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar"><i class="ti ti-user"></i></div>
+        <div class="info">
+          <div class="name" id="user-name">Usuário</div>
+          <div class="role" id="user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="sair()" title="Sair"><i class="ti ti-logout"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-right">
+        <span style="font-size:13px;color:var(--color-text-secondary)" id="data-hoje"></span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="stats" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="ti ti-users"></i></div>
+          <div><div class="stat-value" id="total-alunos">—</div><div class="stat-label">Alunos cadastrados</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="ti ti-clipboard-check"></i></div>
+          <div><div class="stat-value" id="total-matriculas">—</div><div class="stat-label">Matrículas ativas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange"><i class="ti ti-calendar"></i></div>
+          <div><div class="stat-value" id="total-agendamentos">—</div><div class="stat-label">Agendamentos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="ti ti-books"></i></div>
+          <div><div class="stat-value" id="total-cursos">—</div><div class="stat-label">Cursos ativos</div></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="card">
+          <div class="card-header"><h2>Últimas matrículas</h2><a href="matricula.html" class="btn btn-ghost btn-sm">Ver todas</a></div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>Aluno</th><th>Curso</th><th>Status</th></tr></thead>
+              <tbody id="tb-matriculas"><tr class="empty-row"><td colspan="3">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>Próximos agendamentos</h2><a href="agendamento.html" class="btn btn-ghost btn-sm">Ver todos</a></div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>Aluno</th><th>Data</th><th>Status</th></tr></thead>
+              <tbody id="tb-agendamentos"><tr class="empty-row"><td colspan="3">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+  if (!token) window.location.href = 'login.html';
+
+  document.getElementById('user-name').textContent = usuario.nome || 'Usuário';
+  document.getElementById('user-role').textContent = usuario.role === 'admin' ? 'Administrador' : 'Colaborador';
+  document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+
+  if (usuario.role === 'admin') document.getElementById('admin-nav').style.display = 'block';
+
+  const h = { Authorization: `Bearer ${token}` };
+  const statusBadge = s => {
+    const map = { ativa:'badge-green', cancelada:'badge-red', pendente:'badge-yellow', confirmado:'badge-green', concluida:'badge-blue' };
+    return `<span class="badge ${map[s] || 'badge-gray'}">${s}</span>`;
+  };
+
+  async function carregar() {
+    const [ra, rm, rag, rc] = await Promise.all([
+      fetch(`${API}/alunos`,       { headers: h }),
+      fetch(`${API}/matriculas`,   { headers: h }),
+      fetch(`${API}/agendamentos`, { headers: h }),
+      fetch(`${API}/cursos`,       { headers: h })
+    ]);
+    const alunos       = await ra.json();
+    const matriculas   = await rm.json();
+    const agendamentos = await rag.json();
+    const cursos       = await rc.json();
+
+    document.getElementById('total-alunos').textContent       = alunos.length;
+    document.getElementById('total-matriculas').textContent   = matriculas.filter(m=>m.status==='ativa').length;
+    document.getElementById('total-agendamentos').textContent = agendamentos.length;
+    document.getElementById('total-cursos').textContent       = cursos.length;
+
+    const tbM = document.getElementById('tb-matriculas');
+    tbM.innerHTML = matriculas.slice(0,5).map(m=>`
+      <tr>
+        <td>${m.aluno?.nome || '—'}</td>
+        <td>${m.curso?.nome || '—'}</td>
+        <td>${statusBadge(m.status)}</td>
+      </tr>`).join('') || '<tr class="empty-row"><td colspan="3">Nenhuma matrícula</td></tr>';
+
+    const tbA = document.getElementById('tb-agendamentos');
+    tbA.innerHTML = agendamentos.slice(0,5).map(a=>`
+      <tr>
+        <td>${a.aluno?.nome || '—'}</td>
+        <td>${new Date(a.data).toLocaleDateString('pt-BR')} ${a.hora}</td>
+        <td>${statusBadge(a.status)}</td>
+      </tr>`).join('') || '<tr class="empty-row"><td colspan="3">Nenhum agendamento</td></tr>';
+  }
+
+  function sair() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+
+  carregar();
+</script>
+</body>
+</html>

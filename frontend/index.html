@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Escola Técnica</title>
 </head>
 <body>
-
-  <h1>Escola Técnica</h1>
-
-  <button onclick="window.location.href='pages/login.html'">
-    Login
-  </button>
-
-  <button onclick="window.location.href='pages/cadastro.html'">
-    Cadastro de Aluno
-  </button>
-
+  <script>
+    // Redireciona automaticamente
+    const token = localStorage.getItem('token');
+    if (token) {
+      window.location.href = 'pages/dashboard.html';
+    } else {
+      window.location.href = 'pages/login.html';
+    }
+  </script>
 </body>
 </html>

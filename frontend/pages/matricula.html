@@ -1,13 +1,303 @@
-const API = "http://localhost:3000/api";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrícula — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; font-family: var(--font-sans); }
+    .container { max-width: 680px; margin: 0 auto; }
+    .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+    .back-btn { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .back-btn:hover { background: var(--color-background-secondary); }
+    .page-title { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+    .page-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+    .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1rem; }
+    .card-header { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 10px; }
+    .card-header i { font-size: 18px; color: #028090; }
+    .card-header h2 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+    .card-header .step-badge { margin-left: auto; font-size: 11px; background: #E1F5EE; color: #0F6E56; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
+    .card-body { padding: 1.25rem; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+    .field select { width: 100%; height: 40px; padding: 0 12px; font-size: 14px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; transition: border-color 0.15s; }
+    .field select:focus { border-color: #028090; box-shadow: 0 0 0 3px rgba(2,128,144,0.12); }
+    .field select.error { border-color: #E24B4A; }
+    .err-msg { font-size: 12px; color: #E24B4A; display: none; }
+    .err-msg.show { display: block; }
+    .aluno-card { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; margin-top: 0.75rem; }
+    .aluno-card.show { display: flex; gap: 12px; align-items: center; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: #0D2B55; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: #02C39A; flex-shrink: 0; }
+    .aluno-info p { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+    .aluno-info span { font-size: 12px; color: var(--color-text-secondary); }
+    .cursos-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .curso-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; cursor: pointer; transition: all 0.15s; position: relative; background: var(--color-background-primary); }
+    .curso-card:hover { border-color: #028090; }
+    .curso-card.selected { border: 2px solid #028090; background: #E1F5EE; }
+    .curso-card.disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+    .curso-card .curso-nome { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+    .curso-card .curso-info { font-size: 11px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 3px; }
+    .curso-card .tag { position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 6px; border-radius: var(--border-radius-md); font-weight: 500; }
+    .tag-ok { background: #E1F5EE; color: #0F6E56; }
+    .tag-lotado { background: #FAECE7; color: #993C1D; }
+    .curso-detail { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; margin-top: 0.75rem; }
+    .curso-detail.show { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    .detail-item .dl { font-size: 11px; color: var(--color-text-secondary); }
+    .detail-item .dv { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+    .resumo-card { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; }
+    .resumo-card.show { display: block; }
+    .resumo-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+    .resumo-row:last-child { border-bottom: none; }
+    .resumo-row .rl { color: var(--color-text-secondary); }
+    .resumo-row .rv { color: var(--color-text-primary); font-weight: 500; }
+    .alert-box { display: none; border-radius: var(--border-radius-md); padding: 10px 12px; font-size: 13px; margin-top: 0.75rem; align-items: center; gap: 8px; }
+    .alert-box.show { display: flex; }
+    .alert-warn { background: #FAEEDA; border: 0.5px solid #EF9F27; color: #854F0B; }
+    .alert-err  { background: #FAECE7; border: 0.5px solid #F0997B; color: #993C1D; }
+    .card-footer { padding: 1.25rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; justify-content: space-between; align-items: center; background: var(--color-background-secondary); }
+    .btn-cancel { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 1.25rem; height: 40px; font-size: 14px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; }
+    .btn-submit { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 40px; font-size: 14px; font-weight: 500; font-family: var(--font-sans); color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .btn-submit:disabled { background: #B4B2A9; cursor: not-allowed; }
+    .success-screen { display: none; text-align: center; padding: 2.5rem 1.5rem; }
+    .success-screen.show { display: block; }
+    .check-circle { width: 64px; height: 64px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .check-circle i { font-size: 32px; color: #0F6E56; }
+    .success-screen h2 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+    .success-screen p { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+    .msg-simulada { background: #E6F1FB; border: 0.5px solid #85B7EB; border-radius: var(--border-radius-md); padding: 0.75rem 1rem; font-size: 13px; color: #185FA5; text-align: left; margin-bottom: 1.5rem; display: flex; gap: 8px; }
+    .btn-nova { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 40px; font-size: 14px; font-weight: 500; font-family: var(--font-sans); color: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="top-bar">
+      <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="ti ti-arrow-left"></i> Voltar</button>
+      <div>
+        <div class="page-title">Nova Matrícula</div>
+        <div class="page-sub">Selecione o aluno e o curso desejado</div>
+      </div>
+    </div>
 
-export async function criarMatricula(dados) {
-  const res = await fetch(`${API}/matriculas`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(dados)
-  });
+    <div class="card" id="main-card">
+      <div id="form-section">
+        <div class="card-header">
+          <i class="ti ti-user-search"></i>
+          <h2>Selecionar aluno</h2>
+          <span class="step-badge">Passo 1 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label>Aluno</label>
+            <select id="sel-aluno" onchange="selecionarAluno()">
+              <option value="">Selecione o aluno...</option>
+            </select>
+            <span class="err-msg" id="err-aluno">Selecione um aluno</span>
+          </div>
+          <div class="aluno-card" id="aluno-card">
+            <div class="avatar" id="aluno-avatar"></div>
+            <div class="aluno-info">
+              <p id="aluno-nome-display"></p>
+              <span id="aluno-meta"></span>
+            </div>
+          </div>
+          <div class="alert-box alert-err" id="alert-duplicada">
+            <i class="ti ti-alert-circle"></i>
+            <span id="msg-duplicada"></span>
+          </div>
+        </div>
 
-  return await res.json();
-}
+        <div class="card-header" style="border-top:0.5px solid var(--color-border-tertiary)">
+          <i class="ti ti-books"></i>
+          <h2>Selecionar curso</h2>
+          <span class="step-badge">Passo 2 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="cursos-grid" id="cursos-grid"></div>
+          <span class="err-msg" id="err-curso" style="margin-top:8px">Selecione um curso</span>
+          <div class="alert-box alert-warn" id="alert-prereq">
+            <i class="ti ti-info-circle"></i>
+            <span id="msg-prereq">Este curso exige idade mínima que o aluno não atende.</span>
+          </div>
+          <div class="curso-detail" id="curso-detail"></div>
+        </div>
+
+        <div class="card-header" style="border-top:0.5px solid var(--color-border-tertiary)">
+          <i class="ti ti-clipboard-check"></i>
+          <h2>Resumo da matrícula</h2>
+          <span class="step-badge">Passo 3 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="resumo-card" id="resumo-card">
+            <div class="resumo-row"><span class="rl">Aluno</span><span class="rv" id="r-aluno">—</span></div>
+            <div class="resumo-row"><span class="rl">Curso</span><span class="rv" id="r-curso">—</span></div>
+            <div class="resumo-row"><span class="rl">Duração</span><span class="rv" id="r-carga">—</span></div>
+            <div class="resumo-row"><span class="rl">Vagas restantes</span><span class="rv" id="r-vagas">—</span></div>
+            <div class="resumo-row"><span class="rl">Data</span><span class="rv" id="r-data">—</span></div>
+            <div class="resumo-row"><span class="rl">Status</span><span class="rv"><span style="background:#E1F5EE;color:#0F6E56;font-size:12px;padding:2px 8px;border-radius:4px;font-weight:500">Ativa</span></span></div>
+          </div>
+          <div class="alert-box alert-err" id="alert-vagas">
+            <i class="ti ti-alert-circle"></i>
+            <span>Este curso não possui vagas disponíveis.</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn-cancel" onclick="resetar()">Cancelar</button>
+          <button class="btn-submit" id="btn-matricular" onclick="matricular()">
+            <i class="ti ti-user-check"></i> Confirmar matrícula
+          </button>
+        </div>
+      </div>
+
+      <div class="success-screen" id="success-screen">
+        <div class="check-circle"><i class="ti ti-check"></i></div>
+        <h2>Matrícula realizada!</h2>
+        <p id="success-msg"></p>
+        <div class="msg-simulada">
+          <i class="ti ti-message"></i>
+          <span id="msg-confirmacao"></span>
+        </div>
+        <button class="btn-nova" onclick="resetar()">Nova matrícula</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  let alunosData = [], cursosData = [], alunoSel = null, cursoSel = null;
+
+  async function carregarDados() {
+    try {
+      const [ra, rc] = await Promise.all([
+        fetch(`${API}/alunos`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/cursos`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      alunosData = await ra.json();
+      cursosData = await rc.json();
+      const sel = document.getElementById('sel-aluno');
+      alunosData.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a._id;
+        opt.textContent = `${a.nome} — CPF ${a.cpf}`;
+        sel.appendChild(opt);
+      });
+      iniciarGrid();
+    } catch(e) { console.error(e); }
+  }
+
+  function iniciarGrid() {
+    const g = document.getElementById('cursos-grid');
+    if (!cursosData.length) { g.innerHTML = '<p style="font-size:13px;color:var(--color-text-secondary)">Nenhum curso cadastrado. Acesse o Painel Admin para criar cursos.</p>'; return; }
+    g.innerHTML = cursosData.map(c => {
+      const lotado = c.vagas === 0;
+      return `<div class="curso-card${lotado?' disabled':''}" id="cc-${c._id}" onclick="selecionarCurso('${c._id}')">
+        <div class="curso-nome">${c.nome}</div>
+        <div class="curso-info">
+          <span><i class="ti ti-clock" style="font-size:12px"></i> ${c.duracao||'—'}</span>
+          <span><i class="ti ti-users" style="font-size:12px"></i> ${c.vagas} vagas</span>
+        </div>
+        <span class="tag ${lotado?'tag-lotado':'tag-ok'}">${lotado?'Lotado':c.vagas+' vagas'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function selecionarAluno() {
+    const id = document.getElementById('sel-aluno').value;
+    alunoSel = alunosData.find(a => a._id === id) || null;
+    const card = document.getElementById('aluno-card');
+    document.getElementById('alert-duplicada').classList.remove('show');
+    if (!alunoSel) { card.classList.remove('show'); return; }
+    const initials = alunoSel.nome.split(' ').slice(0,2).map(n=>n[0]).join('');
+    document.getElementById('aluno-avatar').textContent = initials;
+    document.getElementById('aluno-nome-display').textContent = alunoSel.nome;
+    document.getElementById('aluno-meta').textContent = 'CPF ' + alunoSel.cpf;
+    card.classList.add('show');
+    document.getElementById('err-aluno').classList.remove('show');
+    document.getElementById('sel-aluno').classList.remove('error');
+  }
+
+  function selecionarCurso(id) {
+    cursoSel = cursosData.find(c => c._id === id) || null;
+    if (!cursoSel) return;
+    document.querySelectorAll('.curso-card').forEach(el => el.classList.remove('selected'));
+    document.getElementById(`cc-${id}`).classList.add('selected');
+    document.getElementById('err-curso').classList.remove('show');
+    document.getElementById('alert-prereq').classList.remove('show');
+    document.getElementById('alert-vagas').classList.remove('show');
+
+    const det = document.getElementById('curso-detail');
+    det.innerHTML = `
+      <div class="detail-item"><div class="dl">Curso</div><div class="dv">${cursoSel.nome}</div></div>
+      <div class="detail-item"><div class="dl">Duração</div><div class="dv">${cursoSel.duracao||'—'}</div></div>
+      <div class="detail-item"><div class="dl">Vagas</div><div class="dv">${cursoSel.vagas}</div></div>`;
+    det.classList.add('show');
+
+    if (alunoSel) {
+      document.getElementById('r-aluno').textContent = alunoSel.nome;
+      document.getElementById('r-curso').textContent = cursoSel.nome;
+      document.getElementById('r-carga').textContent = cursoSel.duracao || '—';
+      document.getElementById('r-vagas').textContent = cursoSel.vagas;
+      document.getElementById('r-data').textContent = new Date().toLocaleDateString('pt-BR');
+      document.getElementById('resumo-card').classList.add('show');
+    }
+    if (cursoSel.vagas === 0) document.getElementById('alert-vagas').classList.add('show');
+  }
+
+  async function matricular() {
+    if (!alunoSel) { document.getElementById('sel-aluno').classList.add('error'); document.getElementById('err-aluno').classList.add('show'); return; }
+    if (!cursoSel) { document.getElementById('err-curso').classList.add('show'); return; }
+    if (cursoSel.vagas === 0) { document.getElementById('alert-vagas').classList.add('show'); return; }
+
+    const btn = document.getElementById('btn-matricular');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader"></i> Processando...';
+
+    try {
+      const res = await fetch(`${API}/matriculas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ aluno: alunoSel._id, curso: cursoSel._id })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('success-msg').textContent = `${alunoSel.nome} foi matriculado(a) em ${cursoSel.nome} com sucesso.`;
+        document.getElementById('msg-confirmacao').textContent = `Mensagem enviada: Sua matrícula no curso ${cursoSel.nome} foi confirmada!`;
+        document.getElementById('success-screen').classList.add('show');
+      } else {
+        document.getElementById('msg-prereq').textContent = data.erro || 'Erro ao realizar matrícula';
+        document.getElementById('alert-prereq').classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-user-check"></i> Confirmar matrícula';
+      }
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-user-check"></i> Confirmar matrícula';
+    }
+  }
+
+  function resetar() {
+    alunoSel = null; cursoSel = null;
+    document.getElementById('sel-aluno').value = '';
+    document.getElementById('aluno-card').classList.remove('show');
+    document.getElementById('resumo-card').classList.remove('show');
+    document.getElementById('curso-detail').classList.remove('show');
+    document.getElementById('success-screen').classList.remove('show');
+    document.getElementById('form-section').style.display = 'block';
+    ['alert-prereq','alert-duplicada','alert-vagas'].forEach(id => document.getElementById(id).classList.remove('show'));
+    const btn = document.getElementById('btn-matricular');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-user-check"></i> Confirmar matrícula';
+    iniciarGrid();
+  }
+
+  carregarDados();
+</script>
+</body>
+</html>

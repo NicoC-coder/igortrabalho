@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><div class="dot"></div><span>Escola Técnica<br>Profissionalizante</span></div>
+    <div class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Principal</div>
+        <a href="dashboard.html" class="nav-link"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+        <a href="cursos.html" class="nav-link"><i class="ti ti-books"></i> Cursos</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Secretaria</div>
+        <a href="cadastro.html" class="nav-link"><i class="ti ti-user-plus"></i> Cadastro de Aluno</a>
+        <a href="matricula.html" class="nav-link"><i class="ti ti-clipboard-list"></i> Matrículas</a>
+        <a href="agendamento.html" class="nav-link"><i class="ti ti-calendar"></i> Agendamentos</a>
+        <a href="mensagens.html" class="nav-link"><i class="ti ti-message"></i> Mensagens</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Administração</div>
+        <a href="admin.html" class="nav-link active"><i class="ti ti-settings"></i> Painel Admin</a>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar"><i class="ti ti-user"></i></div>
+        <div class="info">
+          <div class="name" id="user-name">Admin</div>
+          <div class="role">Administrador</div>
+        </div>
+        <button class="btn-logout" onclick="sair()"><i class="ti ti-logout"></i></button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar"><h1>Painel Administrativo</h1></div>
+    <div class="content">
+
+      <div class="card" style="max-width:600px;margin-bottom:1.5rem">
+        <div class="card-header"><h2>Cadastrar novo curso</h2></div>
+        <div class="card-body">
+          <div class="form-grid form-row-2">
+            <div class="field"><label>Nome do curso <span class="req">*</span></label>
+              <input type="text" id="c-nome" placeholder="Ex: Enfermagem"/></div>
+            <div class="field"><label>Duração</label>
+              <input type="text" id="c-duracao" placeholder="Ex: 6 meses"/></div>
+            <div class="field"><label>Vagas</label>
+              <input type="number" id="c-vagas" value="30"/></div>
+            <div class="field"><label>Idade mínima</label>
+              <input type="number" id="c-idade" value="14"/></div>
+          </div>
+          <div class="field" style="margin-top:1rem"><label>Descrição</label>
+            <textarea id="c-desc" rows="3" placeholder="Descreva o curso..."></textarea></div>
+          <button class="btn btn-primary" style="margin-top:1rem" onclick="criarCurso()">
+            <i class="ti ti-plus"></i> Criar curso
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-header"><h2>Alunos cadastrados</h2></div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr><th>Nome</th><th>CPF</th><th>E-mail</th><th>Telefone</th></tr></thead>
+            <tbody id="tb-alunos"><tr class="empty-row"><td colspan="4">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>Matrículas</h2></div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr><th>Aluno</th><th>Curso</th><th>Data</th><th>Status</th><th>Ação</th></tr></thead>
+            <tbody id="tb-matriculas"><tr class="empty-row"><td colspan="5">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = 'login.html';
+  document.getElementById('user-name').textContent = usuario.nome || 'Admin';
+  const h = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+  function toast(msg, tipo='success') {
+    const t = document.createElement('div');
+    t.className = `toast ${tipo}`;
+    t.textContent = msg;
+    document.getElementById('toasts').appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  async function criarCurso() {
+    const nome = document.getElementById('c-nome').value.trim();
+    if (!nome) { toast('Nome do curso é obrigatório','error'); return; }
+    try {
+      const res = await fetch(`${API}/cursos`, {
+        method: 'POST', headers: h,
+        body: JSON.stringify({
+          nome,
+          duracao: document.getElementById('c-duracao').value,
+          vagas: parseInt(document.getElementById('c-vagas').value) || 30,
+          idadeMinima: parseInt(document.getElementById('c-idade').value) || 14,
+          descricao: document.getElementById('c-desc').value
+        })
+      });
+      if (res.ok) {
+        toast('Curso criado com sucesso!');
+        document.getElementById('c-nome').value = '';
+        document.getElementById('c-duracao').value = '';
+        document.getElementById('c-desc').value = '';
+        carregar();
+      } else {
+        const d = await res.json();
+        toast(d.erro || 'Erro ao criar curso','error');
+      }
+    } catch(e) { toast('Erro de conexão','error'); }
+  }
+
+  async function cancelarMatricula(id) {
+    if (!confirm('Cancelar esta matrícula?')) return;
+    const res = await fetch(`${API}/matriculas/${id}/cancelar`, { method:'PATCH', headers: h });
+    if (res.ok) { toast('Matrícula cancelada'); carregar(); }
+    else toast('Erro ao cancelar','error');
+  }
+
+  const statusBadge = s => {
+    const map = { ativa:'badge-green', cancelada:'badge-red', concluida:'badge-blue' };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+  };
+
+  async function carregar() {
+    const [ra, rm] = await Promise.all([
+      fetch(`${API}/alunos`,     { headers: h }),
+      fetch(`${API}/matriculas`, { headers: h })
+    ]);
+    const alunos     = await ra.json();
+    const matriculas = await rm.json();
+
+    document.getElementById('tb-alunos').innerHTML = alunos.length
+      ? alunos.map(a=>`<tr><td>${a.nome}</td><td>${a.cpf}</td><td>${a.email}</td><td>${a.telefone||'—'}</td></tr>`).join('')
+      : '<tr class="empty-row"><td colspan="4">Nenhum aluno cadastrado</td></tr>';
+
+    document.getElementById('tb-matriculas').innerHTML = matriculas.length
+      ? matriculas.map(m=>`
+        <tr>
+          <td>${m.aluno?.nome||'—'}</td>
+          <td>${m.curso?.nome||'—'}</td>
+          <td>${new Date(m.dataMatricula).toLocaleDateString('pt-BR')}</td>
+          <td>${statusBadge(m.status)}</td>
+          <td>${m.status==='ativa'
+            ?`<button class="btn btn-danger btn-sm" onclick="cancelarMatricula('${m._id}')">Cancelar</button>`
+            :'—'
+          }</td>
+        </tr>`).join('')
+      : '<tr class="empty-row"><td colspan="5">Nenhuma matrícula</td></tr>';
+  }
+
+  function sair() { localStorage.clear(); window.location.href = 'login.html'; }
+  carregar();
+</script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agendamento — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; font-family: var(--font-sans); }
+    .container { max-width: 680px; margin: 0 auto; }
+    .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+    .back-btn { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 10px; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .page-title { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+    .page-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+    .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1rem; }
+    .card-header { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 10px; }
+    .card-header i { font-size: 18px; color: #028090; }
+    .card-header h2 { font-size: 15px; font-weight: 500; }
+    .step-badge { margin-left: auto; font-size: 11px; background: #E1F5EE; color: #0F6E56; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
+    .card-body { padding: 1.25rem; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+    .field select, .field input { width: 100%; height: 40px; padding: 0 12px; font-size: 14px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; transition: border-color 0.15s; }
+    .field select:focus, .field input:focus { border-color: #028090; box-shadow: 0 0 0 3px rgba(2,128,144,0.12); }
+    .err-msg { font-size: 12px; color: #E24B4A; display: none; }
+    .err-msg.show { display: block; }
+    .aluno-card { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; margin-top: 0.75rem; }
+    .aluno-card.show { display: flex; gap: 12px; align-items: center; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #0D2B55; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: #02C39A; flex-shrink: 0; }
+    .aluno-info p { font-size: 14px; font-weight: 500; }
+    .aluno-info span { font-size: 12px; color: var(--color-text-secondary); }
+    .horarios-label { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .horarios-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .hora-btn { height: 38px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); font-size: 13px; font-family: var(--font-sans); cursor: pointer; transition: all 0.15s; }
+    .hora-btn:hover { border-color: #028090; color: #028090; }
+    .hora-btn.selected { background: #028090; color: #fff; border-color: #028090; font-weight: 500; }
+    .resumo-box { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; }
+    .resumo-box.show { display: block; }
+    .resumo-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+    .resumo-row:last-child { border-bottom: none; }
+    .rl { color: var(--color-text-secondary); }
+    .rv { font-weight: 500; }
+    .card-footer { padding: 1.25rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; justify-content: space-between; background: var(--color-background-secondary); }
+    .btn-cancel { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 1.25rem; height: 40px; font-size: 14px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; }
+    .btn-submit { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 40px; font-size: 14px; font-weight: 500; font-family: var(--font-sans); color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .btn-submit:disabled { background: #B4B2A9; cursor: not-allowed; }
+    .success-screen { display: none; text-align: center; padding: 2.5rem 1.5rem; }
+    .success-screen.show { display: block; }
+    .check-circle { width: 64px; height: 64px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .check-circle i { font-size: 32px; color: #0F6E56; }
+    .success-screen h2 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+    .success-screen p { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+    .btn-nova { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 40px; font-size: 14px; font-weight: 500; font-family: var(--font-sans); color: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="top-bar">
+      <button class="back-btn" onclick="window.location.href='dashboard.html'"><i class="ti ti-arrow-left"></i> Voltar</button>
+      <div>
+        <div class="page-title">Agendar Atendimento</div>
+        <div class="page-sub">Escolha o aluno, data e horário</div>
+      </div>
+    </div>
+
+    <div class="card" id="main-card">
+      <div id="form-section">
+        <div class="card-header">
+          <i class="ti ti-user-search"></i>
+          <h2>Selecionar aluno</h2>
+          <span class="step-badge">Passo 1 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label>Aluno</label>
+            <select id="sel-aluno" onchange="selecionarAluno()">
+              <option value="">Selecione o aluno...</option>
+            </select>
+            <span class="err-msg" id="err-aluno">Selecione um aluno</span>
+          </div>
+          <div class="aluno-card" id="aluno-card">
+            <div class="avatar" id="aluno-avatar"></div>
+            <div class="aluno-info">
+              <p id="aluno-nome-display"></p>
+              <span id="aluno-meta"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-header" style="border-top:0.5px solid var(--color-border-tertiary)">
+          <i class="ti ti-calendar"></i>
+          <h2>Data e horário</h2>
+          <span class="step-badge">Passo 2 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="row-2">
+            <div class="field">
+              <label>Data do atendimento</label>
+              <input type="date" id="data-input" onchange="carregarHorarios()"/>
+              <span class="err-msg" id="err-data">Selecione uma data</span>
+            </div>
+            <div class="field">
+              <label>Assunto</label>
+              <select id="assunto" onchange="atualizarResumo()">
+                <option value="">Selecione o assunto...</option>
+                <option>Informações sobre matrícula</option>
+                <option>Documentação pendente</option>
+                <option>Cancelamento de curso</option>
+                <option>Transferência de turma</option>
+                <option>Financeiro / bolsas</option>
+                <option>Outro</option>
+              </select>
+              <span class="err-msg" id="err-assunto">Selecione o assunto</span>
+            </div>
+          </div>
+          <div id="horarios-section" style="display:none">
+            <div class="horarios-label">Horários disponíveis</div>
+            <div class="horarios-grid" id="horarios-grid"></div>
+            <span class="err-msg" id="err-hora" style="margin-top:6px">Selecione um horário</span>
+          </div>
+        </div>
+
+        <div class="card-header" style="border-top:0.5px solid var(--color-border-tertiary)">
+          <i class="ti ti-clipboard-check"></i>
+          <h2>Resumo</h2>
+          <span class="step-badge">Passo 3 de 3</span>
+        </div>
+        <div class="card-body">
+          <div class="resumo-box" id="resumo-box">
+            <div class="resumo-row"><span class="rl">Aluno</span><span class="rv" id="r-aluno">—</span></div>
+            <div class="resumo-row"><span class="rl">Data</span><span class="rv" id="r-data">—</span></div>
+            <div class="resumo-row"><span class="rl">Horário</span><span class="rv" id="r-hora">—</span></div>
+            <div class="resumo-row"><span class="rl">Assunto</span><span class="rv" id="r-assunto">—</span></div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn-cancel" onclick="resetar()">Cancelar</button>
+          <button class="btn-submit" id="btn-agendar" onclick="agendar()">
+            <i class="ti ti-calendar-plus"></i> Confirmar agendamento
+          </button>
+        </div>
+      </div>
+
+      <div class="success-screen" id="success-screen">
+        <div class="check-circle"><i class="ti ti-check"></i></div>
+        <h2>Agendamento confirmado!</h2>
+        <p id="success-msg"></p>
+        <button class="btn-nova" onclick="resetar()">Novo agendamento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  let alunosData = [], cursosData = [], alunoSel = null, horaSel = null;
+  const horariosBase = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00'];
+
+  // Data mínima = amanhã
+  const amanha = new Date();
+  amanha.setDate(amanha.getDate() + 1);
+  document.getElementById('data-input').min = amanha.toISOString().split('T')[0];
+
+  async function carregarDados() {
+    try {
+      const [ra, rc] = await Promise.all([
+        fetch(`${API}/alunos`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/cursos`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      alunosData = await ra.json();
+      cursosData = await rc.json();
+      const sel = document.getElementById('sel-aluno');
+      alunosData.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a._id;
+        opt.textContent = a.nome;
+        sel.appendChild(opt);
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  function selecionarAluno() {
+    const id = document.getElementById('sel-aluno').value;
+    alunoSel = alunosData.find(a => a._id === id) || null;
+    const card = document.getElementById('aluno-card');
+    if (!alunoSel) { card.classList.remove('show'); return; }
+    const initials = alunoSel.nome.split(' ').slice(0,2).map(n=>n[0]).join('');
+    document.getElementById('aluno-avatar').textContent = initials;
+    document.getElementById('aluno-nome-display').textContent = alunoSel.nome;
+    document.getElementById('aluno-meta').textContent = alunoSel.email || alunoSel.cpf || '';
+    card.classList.add('show');
+    atualizarResumo();
+  }
+
+  function carregarHorarios() {
+    horaSel = null;
+    document.getElementById('horarios-grid').innerHTML = horariosBase.map(h =>
+      `<button class="hora-btn" onclick="selecionarHora('${h}')">${h}</button>`
+    ).join('');
+    document.getElementById('horarios-section').style.display = 'block';
+    atualizarResumo();
+  }
+
+  function selecionarHora(hora) {
+    horaSel = hora;
+    document.querySelectorAll('.hora-btn').forEach(b => b.classList.remove('selected'));
+    [...document.querySelectorAll('.hora-btn')].find(b => b.textContent === hora)?.classList.add('selected');
+    document.getElementById('err-hora').classList.remove('show');
+    atualizarResumo();
+  }
+
+  function atualizarResumo() {
+    const data = document.getElementById('data-input').value;
+    const assunto = document.getElementById('assunto').value;
+    if (alunoSel && data && horaSel && assunto) {
+      document.getElementById('r-aluno').textContent = alunoSel.nome;
+      document.getElementById('r-data').textContent = new Date(data+'T12:00').toLocaleDateString('pt-BR', {weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+      document.getElementById('r-hora').textContent = horaSel;
+      document.getElementById('r-assunto').textContent = assunto;
+      document.getElementById('resumo-box').classList.add('show');
+    }
+  }
+
+  function validar() {
+    let ok = true;
+    if (!alunoSel) { document.getElementById('sel-aluno').classList.add('error'); document.getElementById('err-aluno').classList.add('show'); ok=false; }
+    if (!document.getElementById('data-input').value) { document.getElementById('err-data').classList.add('show'); ok=false; }
+    if (!horaSel) { document.getElementById('err-hora').classList.add('show'); ok=false; }
+    if (!document.getElementById('assunto').value) { document.getElementById('err-assunto').classList.add('show'); ok=false; }
+    return ok;
+  }
+
+  async function agendar() {
+    if (!validar()) return;
+    const btn = document.getElementById('btn-agendar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader"></i> Agendando...';
+    try {
+      const res = await fetch(`${API}/agendamentos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          aluno: alunoSel._id,
+          curso: cursosData[0]?._id || null,
+          data: document.getElementById('data-input').value,
+          hora: horaSel,
+          tipo: document.getElementById('assunto').value
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('success-msg').textContent = `${alunoSel.nome} — ${new Date(document.getElementById('data-input').value+'T12:00').toLocaleDateString('pt-BR')} às ${horaSel}`;
+        document.getElementById('success-screen').classList.add('show');
+      } else {
+        alert(data.erro || 'Erro ao agendar');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-calendar-plus"></i> Confirmar agendamento';
+      }
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-calendar-plus"></i> Confirmar agendamento';
+    }
+  }
+
+  function resetar() {
+    alunoSel = null; horaSel = null;
+    document.getElementById('sel-aluno').value = '';
+    document.getElementById('data-input').value = '';
+    document.getElementById('assunto').value = '';
+    document.getElementById('aluno-card').classList.remove('show');
+    document.getElementById('horarios-section').style.display = 'none';
+    document.getElementById('resumo-box').classList.remove('show');
+    document.getElementById('success-screen').classList.remove('show');
+    document.getElementById('form-section').style.display = 'block';
+    const btn = document.getElementById('btn-agendar');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-calendar-plus"></i> Confirmar agendamento';
+  }
+
+  carregarDados();
+</script>
+</body>
+</html>

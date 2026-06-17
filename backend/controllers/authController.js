@@ -1,32 +1,44 @@
 const Usuario = require("../models/Usuario");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const bcrypt  = require("bcryptjs");
+const jwt     = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
-  const { nome, email, senha } = req.body;
-
-  const existe = await Usuario.findOne({ email });
-  if (existe) return res.json({ msg: "Email já existe" });
-
-  const user = await Usuario.create({ nome, email, senha });
-
-  res.json(user);
+  try {
+    const { nome, email, senha, role } = req.body;
+    const existe = await Usuario.findOne({ email });
+    if (existe) return res.status(400).json({ erro: "E-mail já cadastrado" });
+    const user = await Usuario.create({ nome, email, senha, role: role || "aluno" });
+    const { senha: _, ...sem } = user.toObject();
+    res.status(201).json(sem);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
 };
 
 exports.login = async (req, res) => {
-  const { email, senha } = req.body;
+  try {
+    const { email, senha } = req.body;
+    const user = await Usuario.findOne({ email });
+    if (!user) return res.status(401).json({ erro: "E-mail ou senha incorretos" });
+    const ok = await bcrypt.compare(senha, user.senha);
+    if (!ok) return res.status(401).json({ erro: "E-mail ou senha incorretos" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+    const { senha: _, ...sem } = user.toObject();
+    res.json({ token, user: sem });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+};
 
-  const user = await Usuario.findOne({ email });
-  if (!user) return res.json({ msg: "Usuário não existe" });
-
-  const ok = await bcrypt.compare(senha, user.senha);
-  if (!ok) return res.json({ msg: "Senha errada" });
-
-  const token = jwt.sign(
-    { id: user._id },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
-
-  res.json({ token, user });
+exports.me = async (req, res) => {
+  try {
+    const user = await Usuario.findById(req.user.id).select("-senha");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
 };

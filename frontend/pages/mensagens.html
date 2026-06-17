@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mensagens — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; font-family: var(--font-sans); }
+    .container { max-width: 720px; margin: 0 auto; }
+    .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .top-left h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+    .top-left p { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+    .badge-count { display: inline-flex; align-items: center; justify-content: center; background: #028090; color: #fff; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; margin-left: 8px; }
+    .back-btn { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 12px; font-size: 13px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .back-btn:hover { background: var(--color-background-secondary); }
+    .filters { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.85rem 1.25rem; margin-bottom: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .search-wrap { position: relative; flex: 1; min-width: 160px; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--color-text-secondary); pointer-events: none; }
+    .search-wrap input { width: 100%; height: 34px; padding: 0 10px 0 32px; font-size: 13px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+    .search-wrap input:focus { border-color: #028090; }
+    .filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-btn { height: 34px; padding: 0 12px; font-size: 12px; font-weight: 500; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover { border-color: #028090; color: #028090; }
+    .filter-btn.active { background: #028090; color: #fff; border-color: #028090; }
+    .results-info { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 0.75rem; }
+    .msg-list { display: flex; flex-direction: column; gap: 8px; }
+    .msg-item { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+    .msg-item.nao-lida { border-left: 3px solid #028090; }
+    .msg-header { padding: 1rem 1.1rem; display: flex; align-items: center; gap: 12px; }
+    .msg-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .msg-icon.matricula { background: #E1F5EE; }
+    .msg-icon.agendamento { background: #E6F1FB; }
+    .msg-icon.cancelamento { background: #FAECE7; }
+    .msg-icon.sistema { background: #F0EBFF; }
+    .msg-content { flex: 1; min-width: 0; }
+    .msg-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+    .msg-tipo { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: var(--border-radius-md); text-transform: uppercase; }
+    .tipo-matricula { background: #E1F5EE; color: #0F6E56; }
+    .tipo-agendamento { background: #E6F1FB; color: #185FA5; }
+    .tipo-cancelamento { background: #FAECE7; color: #993C1D; }
+    .tipo-sistema { background: #F0EBFF; color: #6D28D9; }
+    .msg-aluno { font-size: 12px; color: var(--color-text-secondary); }
+    .msg-titulo { font-size: 13px; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .msg-preview { font-size: 12px; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .msg-data { font-size: 11px; color: var(--color-text-secondary); flex-shrink: 0; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
+    .stat-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.85rem; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+    .stat-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--color-text-secondary); font-size: 14px; }
+    .empty i { font-size: 36px; display: block; margin-bottom: 0.5rem; opacity: 0.35; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="top-bar">
+      <div class="top-left">
+        <h1>Mensagens <span class="badge-count" id="badge-count">0</span></h1>
+        <p>Histórico de notificações do sistema</p>
+      </div>
+      <button class="back-btn" onclick="window.location.href='dashboard.html'">
+        <i class="ti ti-arrow-left"></i> Voltar
+      </button>
+    </div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="stat-num" id="s-total">—</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-matricula" style="color:#0F6E56">—</div><div class="stat-label">Matrículas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-agendamento" style="color:#185FA5">—</div><div class="stat-label">Agendamentos</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-cancelamento" style="color:#993C1D">—</div><div class="stat-label">Cancelamentos</div></div>
+    </div>
+
+    <div class="filters">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search" placeholder="Buscar mensagem..." oninput="filtrar()"/>
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active" onclick="setFiltro('todos',this)">Todos</button>
+        <button class="filter-btn" onclick="setFiltro('matricula',this)">🎓 Matrícula</button>
+        <button class="filter-btn" onclick="setFiltro('agendamento',this)">📅 Agendamento</button>
+        <button class="filter-btn" onclick="setFiltro('cancelamento',this)">❌ Cancelamento</button>
+      </div>
+    </div>
+
+    <div class="results-info" id="results-info"></div>
+    <div class="msg-list" id="msg-list"><div class="empty"><i class="ti ti-loader"></i> Carregando...</div></div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const token = localStorage.getItem('token');
+  let mensagens = [], filtroAtual = 'todos';
+  const tipoIcon  = { matricula:'🎓', agendamento:'📅', cancelamento:'❌', sistema:'⚙️' };
+  const tipoLabel = { matricula:'Matrícula', agendamento:'Agendamento', cancelamento:'Cancelamento', sistema:'Sistema' };
+
+  async function carregar() {
+    try {
+      const res = await fetch(`${API}/mensagens`, { headers: { Authorization: `Bearer ${token}` } });
+      mensagens = await res.json();
+      atualizarStats();
+      filtrar();
+    } catch(e) {
+      document.getElementById('msg-list').innerHTML = '<div class="empty"><i class="ti ti-wifi-off"></i> Erro ao carregar mensagens</div>';
+    }
+  }
+
+  function atualizarStats() {
+    document.getElementById('s-total').textContent = mensagens.length;
+    document.getElementById('s-matricula').textContent = mensagens.filter(m=>m.tipo==='matricula').length;
+    document.getElementById('s-agendamento').textContent = mensagens.filter(m=>m.tipo==='agendamento').length;
+    document.getElementById('s-cancelamento').textContent = mensagens.filter(m=>m.tipo==='cancelamento').length;
+    document.getElementById('badge-count').textContent = mensagens.length;
+  }
+
+  function filtrar() {
+    const q = document.getElementById('search').value.toLowerCase();
+    let lista = mensagens;
+    if (filtroAtual !== 'todos') lista = lista.filter(m => m.tipo === filtroAtual);
+    if (q) lista = lista.filter(m => m.conteudo?.toLowerCase().includes(q) || m.aluno?.nome?.toLowerCase().includes(q));
+    document.getElementById('results-info').textContent = `${lista.length} mensagem${lista.length!==1?'s':''} encontrada${lista.length!==1?'s':''}`;
+    const el = document.getElementById('msg-list');
+    if (!lista.length) { el.innerHTML = '<div class="empty"><i class="ti ti-inbox"></i> Nenhuma mensagem encontrada</div>'; return; }
+    el.innerHTML = lista.map(m => `
+      <div class="msg-item">
+        <div class="msg-header">
+          <div class="msg-icon ${m.tipo||'sistema'}">${tipoIcon[m.tipo]||'📩'}</div>
+          <div class="msg-content">
+            <div class="msg-top">
+              <span class="msg-tipo tipo-${m.tipo||'sistema'}">${tipoLabel[m.tipo]||'Sistema'}</span>
+              <span class="msg-aluno">${m.aluno?.nome||'—'}</span>
+            </div>
+            <div class="msg-titulo">${m.conteudo?.slice(0,60)}...</div>
+            <div class="msg-preview">${m.conteudo}</div>
+          </div>
+          <span class="msg-data">${new Date(m.createdAt).toLocaleDateString('pt-BR')}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  function setFiltro(f, el) {
+    filtroAtual = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    filtrar();
+  }
+
+  carregar();
+</script>
+</body>
+</html>

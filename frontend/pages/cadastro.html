@@ -1,48 +1,58 @@
-
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans); }
-  .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; }
-  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); max-width: 680px; margin: 0 auto; overflow: hidden; }
-  .card-header { background: #0D2B55; padding: 1.5rem 2rem; }
-  .card-header .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
-  .card-header .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: #02C39A; }
-  .card-header h1 { font-size: 20px; font-weight: 500; color: #fff; }
-  .card-header p { font-size: 13px; color: #94A3B8; margin-top: 2px; }
-  .progress-bar { height: 3px; background: #02C39A; width: 100%; margin-top: 1rem; border-radius: 2px; }
-  .card-body { padding: 2rem; }
-  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-  .section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
-  .row { display: grid; gap: 1rem; margin-bottom: 1rem; }
-  .row-2 { grid-template-columns: 1fr 1fr; }
-  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
-  .field label .req { color: #E24B4A; margin-left: 2px; }
-  .field input, .field select { width: 100%; height: 38px; padding: 0 12px; font-size: 14px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); transition: border-color 0.15s; outline: none; }
-  .field input:focus, .field select:focus { border-color: #028090; box-shadow: 0 0 0 3px rgba(2,128,144,0.12); }
-  .field input.error, .field select.error { border-color: #E24B4A; }
-  .field input.ok { border-color: #1D9E75; }
-  .field .hint { font-size: 12px; color: var(--color-text-secondary); }
-  .field .err-msg { font-size: 12px; color: #E24B4A; display: none; }
-  .field .err-msg.show { display: block; }
-  .section-gap { margin-top: 1.5rem; }
-  .row-addr { grid-template-columns: 1fr 80px; }
-  .row-addr2 { grid-template-columns: 1fr 1fr 100px; }
-  .card-footer { padding: 1.5rem 2rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; background: var(--color-background-secondary); }
-  .btn-cancel { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 1.25rem; height: 38px; font-size: 14px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; }
-  .btn-cancel:hover { background: var(--color-background-secondary); }
-  .btn-submit { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 38px; font-size: 14px; font-family: var(--font-sans); font-weight: 500; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
-  .btn-submit:hover { background: #0D9488; }
-  .btn-submit:disabled { background: #B4B2A9; cursor: not-allowed; }
-  .toast { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; background: #0F6E56; color: #fff; padding: 0.75rem 1.25rem; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; gap: 8px; align-items: center; z-index: 999; }
-  .toast.show { display: flex; }
-  .toast.err { background: #993C1D; }
-  .age-badge { display: none; font-size: 12px; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
-  .age-badge.ok { display: inline-block; background: #E1F5EE; color: #0F6E56; }
-  .age-badge.bad { display: inline-block; background: #FAECE7; color: #993C1D; }
-</style>
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro de Aluno — Escola Técnica</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="../css/global.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); }
+    .page { background: var(--color-background-tertiary); min-height: 100vh; padding: 2rem 1rem; }
+    .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); max-width: 680px; margin: 0 auto; overflow: hidden; }
+    .card-header { background: #0D2B55; padding: 1.5rem 2rem; }
+    .card-header .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem; }
+    .card-header .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: #02C39A; }
+    .card-header h1 { font-size: 20px; font-weight: 500; color: #fff; }
+    .card-header p { font-size: 13px; color: #94A3B8; margin-top: 2px; }
+    .progress-bar { height: 3px; background: #02C39A; width: 100%; margin-top: 1rem; border-radius: 2px; }
+    .card-body { padding: 2rem; }
+    .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+    .row { display: grid; gap: 1rem; margin-bottom: 1rem; }
+    .row-2 { grid-template-columns: 1fr 1fr; }
+    .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+    .field label .req { color: #E24B4A; margin-left: 2px; }
+    .field input, .field select { width: 100%; height: 38px; padding: 0 12px; font-size: 14px; font-family: var(--font-sans); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); transition: border-color 0.15s; outline: none; }
+    .field input:focus, .field select:focus { border-color: #028090; box-shadow: 0 0 0 3px rgba(2,128,144,0.12); }
+    .field input.error, .field select.error { border-color: #E24B4A; }
+    .field input.ok { border-color: #1D9E75; }
+    .field .hint { font-size: 12px; color: var(--color-text-secondary); }
+    .field .err-msg { font-size: 12px; color: #E24B4A; display: none; }
+    .field .err-msg.show { display: block; }
+    .section-gap { margin-top: 1.5rem; }
+    .row-addr { grid-template-columns: 1fr 80px; }
+    .row-addr2 { grid-template-columns: 1fr 1fr 100px; }
+    .card-footer { padding: 1.5rem 2rem; border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: space-between; background: var(--color-background-secondary); }
+    .btn-cancel { background: none; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0 1.25rem; height: 38px; font-size: 14px; font-family: var(--font-sans); color: var(--color-text-secondary); cursor: pointer; }
+    .btn-cancel:hover { background: var(--color-background-secondary); }
+    .btn-submit { background: #028090; border: none; border-radius: var(--border-radius-md); padding: 0 1.5rem; height: 38px; font-size: 14px; font-family: var(--font-sans); font-weight: 500; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
+    .btn-submit:hover { background: #0D9488; }
+    .btn-submit:disabled { background: #B4B2A9; cursor: not-allowed; }
+    .toast { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; background: #0F6E56; color: #fff; padding: 0.75rem 1.25rem; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; gap: 8px; align-items: center; z-index: 999; }
+    .toast.show { display: flex; }
+    .toast.err { background: #993C1D; }
+    .age-badge { display: none; font-size: 12px; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
+    .age-badge.ok { display: inline-block; background: #E1F5EE; color: #0F6E56; }
+    .age-badge.bad { display: inline-block; background: #FAECE7; color: #993C1D; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #94A3B8; font-size: 13px; background: none; border: none; cursor: pointer; margin-bottom: 1rem; font-family: var(--font-sans); }
+    .back-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
 <div class="page">
   <div class="card">
     <div class="card-header">
@@ -50,6 +60,9 @@
         <div class="logo-dot"></div>
         <span style="font-size:13px;color:#94A3B8;">Escola Técnica Profissionalizante</span>
       </div>
+      <button class="back-btn" onclick="window.location.href='dashboard.html'">
+        <i class="ti ti-arrow-left"></i> Voltar ao dashboard
+      </button>
       <h1>Cadastro de Aluno</h1>
       <p>Preencha todos os campos obrigatórios para concluir o cadastro</p>
       <div class="progress-bar"></div>
@@ -61,7 +74,7 @@
       <div class="row">
         <div class="field">
           <label>Nome completo <span class="req">*</span></label>
-          <input type="text" id="nome" placeholder="Ex: Maria Silva Santos" autocomplete="name" />
+          <input type="text" id="nome" placeholder="Ex: Maria Silva Santos" autocomplete="name"/>
           <span class="err-msg" id="err-nome">Nome é obrigatório</span>
         </div>
       </div>
@@ -69,12 +82,12 @@
       <div class="row row-2">
         <div class="field">
           <label>CPF <span class="req">*</span></label>
-          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" />
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14"/>
           <span class="err-msg" id="err-cpf">CPF inválido</span>
         </div>
         <div class="field">
           <label>Data de nascimento <span class="req">*</span> <span class="age-badge" id="age-badge"></span></label>
-          <input type="date" id="nascimento" />
+          <input type="date" id="nascimento"/>
           <span class="err-msg" id="err-nasc">Aluno deve ter pelo menos 14 anos</span>
         </div>
       </div>
@@ -82,12 +95,12 @@
       <div class="row row-2">
         <div class="field">
           <label>Telefone <span class="req">*</span></label>
-          <input type="text" id="telefone" placeholder="(00) 00000-0000" maxlength="15" />
+          <input type="text" id="telefone" placeholder="(00) 00000-0000" maxlength="15"/>
           <span class="err-msg" id="err-tel">Telefone inválido</span>
         </div>
         <div class="field">
           <label>E-mail <span class="req">*</span></label>
-          <input type="email" id="email" placeholder="aluno@email.com" />
+          <input type="email" id="email" placeholder="aluno@email.com"/>
           <span class="err-msg" id="err-email">E-mail inválido</span>
         </div>
       </div>
@@ -97,7 +110,7 @@
       <div class="row">
         <div class="field">
           <label>CEP <span class="req">*</span></label>
-          <input type="text" id="cep" placeholder="00000-000" maxlength="9" style="max-width:160px" />
+          <input type="text" id="cep" placeholder="00000-000" maxlength="9" style="max-width:160px"/>
           <span class="hint">Digite o CEP para preencher o endereço automaticamente</span>
           <span class="err-msg" id="err-cep">CEP inválido</span>
         </div>
@@ -106,12 +119,12 @@
       <div class="row row-addr">
         <div class="field">
           <label>Rua <span class="req">*</span></label>
-          <input type="text" id="rua" placeholder="Nome da rua" />
+          <input type="text" id="rua" placeholder="Nome da rua"/>
           <span class="err-msg" id="err-rua">Rua é obrigatória</span>
         </div>
         <div class="field">
           <label>Número <span class="req">*</span></label>
-          <input type="text" id="numero" placeholder="Nº" />
+          <input type="text" id="numero" placeholder="Nº"/>
           <span class="err-msg" id="err-num">Obrigatório</span>
         </div>
       </div>
@@ -119,12 +132,12 @@
       <div class="row row-addr2">
         <div class="field">
           <label>Bairro <span class="req">*</span></label>
-          <input type="text" id="bairro" placeholder="Nome do bairro" />
+          <input type="text" id="bairro" placeholder="Nome do bairro"/>
           <span class="err-msg" id="err-bairro">Bairro é obrigatório</span>
         </div>
         <div class="field">
           <label>Cidade <span class="req">*</span></label>
-          <input type="text" id="cidade" placeholder="Cidade" />
+          <input type="text" id="cidade" placeholder="Cidade"/>
           <span class="err-msg" id="err-cidade">Cidade é obrigatória</span>
         </div>
         <div class="field">
@@ -141,8 +154,7 @@
     <div class="card-footer">
       <button class="btn-cancel" onclick="limpar()">Limpar</button>
       <button class="btn-submit" id="btn-submit" onclick="submeter()">
-        <i class="ti ti-user-plus" aria-hidden="true"></i>
-        Cadastrar aluno
+        <i class="ti ti-user-plus"></i> Cadastrar aluno
       </button>
     </div>
   </div>
@@ -151,7 +163,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const $ = id => document.getElementById(id);
+  const API = 'http://localhost:3000/api';
+
+  function getToken() { return localStorage.getItem('token'); }
 
   function maskCPF(v) {
     return v.replace(/\D/g,'').slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
@@ -184,51 +198,38 @@
     return a;
   }
 
-  $('cpf').addEventListener('input', function() {
-    this.value = maskCPF(this.value);
-  });
-  $('telefone').addEventListener('input', function() {
-    this.value = maskTel(this.value);
-  });
-  $('cep').addEventListener('input', function() {
+  document.getElementById('cpf').addEventListener('input', function() { this.value = maskCPF(this.value); });
+  document.getElementById('telefone').addEventListener('input', function() { this.value = maskTel(this.value); });
+  document.getElementById('cep').addEventListener('input', function() {
     this.value = maskCEP(this.value);
     if (this.value.replace(/\D/g,'').length === 8) buscarCEP(this.value);
   });
-
-  $('nascimento').addEventListener('change', function() {
-    const badge = $('age-badge');
-    const errEl = $('err-nasc');
+  document.getElementById('nascimento').addEventListener('change', function() {
+    const badge = document.getElementById('age-badge');
     if (!this.value) { badge.className='age-badge'; return; }
     const idade = calcIdade(this.value);
     badge.textContent = idade + ' anos';
-    if (idade < 14) {
-      badge.className = 'age-badge bad';
-      this.classList.add('error'); this.classList.remove('ok');
-      errEl.classList.add('show');
-    } else {
-      badge.className = 'age-badge ok';
-      this.classList.remove('error'); this.classList.add('ok');
-      errEl.classList.remove('show');
-    }
+    badge.className = idade < 14 ? 'age-badge bad' : 'age-badge ok';
+    if (idade < 14) { this.classList.add('error'); document.getElementById('err-nasc').classList.add('show'); }
+    else { this.classList.remove('error'); document.getElementById('err-nasc').classList.remove('show'); }
   });
 
   async function buscarCEP(cep) {
-    const c = cep.replace(/\D/g,'');
     try {
-      const r = await fetch(`https://viacep.com.br/ws/${c}/json/`);
+      const r = await fetch(`https://viacep.com.br/ws/${cep.replace(/\D/g,'')}/json/`);
       const d = await r.json();
       if (!d.erro) {
-        $('rua').value = d.logradouro || '';
-        $('bairro').value = d.bairro || '';
-        $('cidade').value = d.localidade || '';
-        $('uf').value = d.uf || '';
-        $('numero').focus();
+        document.getElementById('rua').value    = d.logradouro || '';
+        document.getElementById('bairro').value = d.bairro || '';
+        document.getElementById('cidade').value = d.localidade || '';
+        document.getElementById('uf').value     = d.uf || '';
+        document.getElementById('numero').focus();
       }
     } catch(e) {}
   }
 
   function setErr(id, errId, show) {
-    const el = $(id), err = $(errId);
+    const el = document.getElementById(id), err = document.getElementById(errId);
     if (show) { el.classList.add('error'); el.classList.remove('ok'); err.classList.add('show'); }
     else { el.classList.remove('error'); err.classList.remove('show'); }
     return show;
@@ -236,51 +237,65 @@
 
   function validar() {
     let ok = true;
-    if (!$('nome').value.trim()) ok = setErr('nome','err-nome',true) && false; else setErr('nome','err-nome',false);
-    const cpfVal = $('cpf').value;
-    if (!validarCPF(cpfVal)) ok = setErr('cpf','err-cpf',true) && false; else setErr('cpf','err-cpf',false);
-    const nascVal = $('nascimento').value;
-    if (!nascVal || calcIdade(nascVal) < 14) ok = setErr('nascimento','err-nasc',true) && false; else setErr('nascimento','err-nasc',false);
-    const tel = $('telefone').value.replace(/\D/g,'');
-    if (tel.length < 10) ok = setErr('telefone','err-tel',true) && false; else setErr('telefone','err-tel',false);
-    const email = $('email').value;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ok = setErr('email','err-email',true) && false; else setErr('email','err-email',false);
-    const cep = $('cep').value.replace(/\D/g,'');
-    if (cep.length < 8) ok = setErr('cep','err-cep',true) && false; else setErr('cep','err-cep',false);
-    if (!$('rua').value.trim()) ok = setErr('rua','err-rua',true) && false; else setErr('rua','err-rua',false);
-    if (!$('numero').value.trim()) ok = setErr('numero','err-num',true) && false; else setErr('numero','err-num',false);
-    if (!$('bairro').value.trim()) ok = setErr('bairro','err-bairro',true) && false; else setErr('bairro','err-bairro',false);
-    if (!$('cidade').value.trim()) ok = setErr('cidade','err-cidade',true) && false; else setErr('cidade','err-cidade',false);
-    if (!$('uf').value) ok = setErr('uf','err-uf',true) && false; else setErr('uf','err-uf',false);
+    if (!document.getElementById('nome').value.trim()) { setErr('nome','err-nome',true); ok=false; } else setErr('nome','err-nome',false);
+    if (!validarCPF(document.getElementById('cpf').value)) { setErr('cpf','err-cpf',true); ok=false; } else setErr('cpf','err-cpf',false);
+    const nasc = document.getElementById('nascimento').value;
+    if (!nasc || calcIdade(nasc) < 14) { setErr('nascimento','err-nasc',true); ok=false; } else setErr('nascimento','err-nasc',false);
+    if (document.getElementById('telefone').value.replace(/\D/g,'').length < 10) { setErr('telefone','err-tel',true); ok=false; } else setErr('telefone','err-tel',false);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value)) { setErr('email','err-email',true); ok=false; } else setErr('email','err-email',false);
+    if (document.getElementById('cep').value.replace(/\D/g,'').length < 8) { setErr('cep','err-cep',true); ok=false; } else setErr('cep','err-cep',false);
+    if (!document.getElementById('rua').value.trim()) { setErr('rua','err-rua',true); ok=false; } else setErr('rua','err-rua',false);
+    if (!document.getElementById('numero').value.trim()) { setErr('numero','err-num',true); ok=false; } else setErr('numero','err-num',false);
+    if (!document.getElementById('bairro').value.trim()) { setErr('bairro','err-bairro',true); ok=false; } else setErr('bairro','err-bairro',false);
+    if (!document.getElementById('cidade').value.trim()) { setErr('cidade','err-cidade',true); ok=false; } else setErr('cidade','err-cidade',false);
+    if (!document.getElementById('uf').value) { setErr('uf','err-uf',true); ok=false; } else setErr('uf','err-uf',false);
     return ok;
   }
 
   function toast(msg, tipo) {
-    const t = $('toast');
+    const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast show' + (tipo==='err' ? ' err' : '');
     setTimeout(() => t.className='toast', 3000);
   }
 
-  function submeter() {
+  async function submeter() {
     if (!validar()) { toast('Corrija os erros antes de continuar', 'err'); return; }
-    const btn = $('btn-submit');
+    const btn = document.getElementById('btn-submit');
     btn.disabled = true;
-    btn.innerHTML = '<i class="ti ti-loader" aria-hidden="true"></i> Cadastrando...';
-    setTimeout(() => {
-      toast('Aluno cadastrado com sucesso!');
+    btn.innerHTML = '<i class="ti ti-loader"></i> Cadastrando...';
+    try {
+      const res = await fetch(`${API}/alunos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify({
+          nome: document.getElementById('nome').value.trim(),
+          cpf: document.getElementById('cpf').value,
+          nascimento: document.getElementById('nascimento').value,
+          telefone: document.getElementById('telefone').value,
+          email: document.getElementById('email').value.trim()
+        })
+      });
+      const data = await res.json();
+      if (res.ok) { toast('Aluno cadastrado com sucesso!'); limpar(); }
+      else toast(data.erro || 'Erro ao cadastrar aluno', 'err');
+    } catch(e) {
+      toast('Erro de conexão com o servidor', 'err');
+    } finally {
       btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-user-plus" aria-hidden="true"></i> Cadastrar aluno';
-      limpar();
-    }, 1200);
+      btn.innerHTML = '<i class="ti ti-user-plus"></i> Cadastrar aluno';
+    }
   }
 
   function limpar() {
     ['nome','cpf','nascimento','telefone','email','cep','rua','numero','bairro','cidade'].forEach(id => {
-      $(id).value = ''; $(id).classList.remove('error','ok');
+      document.getElementById(id).value = '';
+      document.getElementById(id).classList.remove('error','ok');
     });
-    $('uf').value = '';
-    $('age-badge').className = 'age-badge';
+    document.getElementById('uf').value = '';
+    document.getElementById('age-badge').className = 'age-badge';
     document.querySelectorAll('.err-msg').forEach(e => e.classList.remove('show'));
   }
 </script>
+</body>
+</html>
