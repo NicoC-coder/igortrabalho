@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/api";
+const API = "https://escola-tecnica-backend.onrender.com/api";
 
 export async function criarAluno(aluno) {
   const res = await fetch(`${API}/alunos`, {

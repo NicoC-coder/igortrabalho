@@ -5,7 +5,7 @@ async function cadastrar() {
   const telefone = document.getElementById("telefone").value;
   const email = document.getElementById("email").value;
 
-  const res = await fetch("http://localhost:3000/api/alunos", {
+  const res = await fetch("https://escola-tecnica-backend.onrender.com/api/alunos", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
