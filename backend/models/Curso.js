@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const CursoSchema = new mongoose.Schema({
   nome:        { type: String, required: true },
-  descricao:   { type: String, default: "" },
+  descricao:   { type: Number, default: "" },
   duracao:     { type: String, default: "" },
   vagas:       { type: Number, default: 30 },
   idadeMinima: { type: Number, default: 14 },
